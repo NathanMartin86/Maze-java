@@ -28,7 +28,7 @@ public class Main {
         return neighbors;
     }
 
-    static Room randomNeigbor (ArrayList<ArrayList<Room>> rooms, int row, int col){
+    static Room randomNeighbor (ArrayList<ArrayList<Room>> rooms, int row, int col){
         ArrayList<Room>neighbors = possibleNeighbors(rooms,row,col);
         neighbors = neighbors.stream()
                 .filter(room ->{
@@ -64,8 +64,19 @@ public class Main {
 
     static boolean createMaze (ArrayList<ArrayList<Room>> rooms,Room room){
         room.wasVisited = true;
-        Room nextRoom = randomNeigbor(rooms, room.row,room.col);
+        Room nextRoom = randomNeighbor(rooms, room.row, room.col);
         if (nextRoom == null){
+            boolean tempFinish = false;
+            for (ArrayList<Room> tempRooms : rooms){
+                for (Room tempRoom : tempRooms){
+                    if (tempRoom.isFinish){
+                        tempFinish = true;
+                    }
+                }
+            }
+            if(!tempFinish){
+                room.isFinish = true;
+            }
             return false;
         }
 
@@ -81,6 +92,8 @@ public class Main {
     public static void main(String[] args) {
         ArrayList<ArrayList<Room>> rooms = createRooms();
         createMaze(rooms, rooms.get(0).get(0));
+        rooms.get(0).get(0).isStart = true;
+
         for (ArrayList<Room>roomRow : rooms){
             System.out.print(" _");
         }
@@ -90,8 +103,14 @@ public class Main {
             System.out.print("|"); // left edge
             for (Room room : roomRow){
                 String s1  = room.hasBottom ? "_" : " ";
+                if (room.isStart){
+                    s1 = "o";
+                }
                 String s2 = room.hasRight ? "|" : " ";
-                System.out.print(s1+s2);
+                if(room.isFinish){
+                    s1 = "x";
+                }
+                System.out.print(s1 + s2);
             }
             System.out.println();
         }
